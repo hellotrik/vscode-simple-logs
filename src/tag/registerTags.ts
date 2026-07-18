@@ -308,13 +308,16 @@ export const registerTagFeatures = (context: vscode.ExtensionContext): void => {
       if (!tag) {
         return
       }
-      const result = await revealTagInGitTree(tag.name)
+      const result = await revealTagInGitTree({
+        tagName: tag.name,
+        repoRoot: provider.getRepoRoot(),
+        commit: tag.object ?? tag.commit
+      })
       if (!result.ok) {
         vscode.window.showErrorMessage(result.message)
         return
       }
-      // 轻提示即可，不再提供 Detached 高亮（会破坏/打乱图表）
-      vscode.window.setStatusBarMessage(result.message, 5000)
+      vscode.window.setStatusBarMessage(result.message, 4000)
     })
   )
 }

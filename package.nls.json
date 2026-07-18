@@ -24,7 +24,7 @@
   "simple-logs.tags.editMessage": "Edit Tag Message",
   "simple-logs.tags.createBranch": "Create Branch from Tag",
   "simple-logs.tags.checkout": "Checkout Tag (Detached)",
-  "simple-logs.tags.revealInGitTree": "Reveal in Git Graph",
+  "simple-logs.tags.revealInGitTree": "Open in Source Control Graph",
   "simple-logs.tags.defaultRemote": "Default remote for tag push/delete (empty = auto: sole remote, else origin)",
   "simple-logs.tags.confirmDangerous": "Confirm before delete remote / delete both / prune / force move",
   "simple-logs.tags.sortOrder": "Tag list sort order",
@@ -34,5 +34,5 @@
   "simple-logs.tags.sortOrder.versionAsc": "Semver ascending",
   "simple-logs.tags.sortOrder.nameAsc": "Name A→Z",
   "simple-logs.tags.sortOrder.dateDesc": "Tagger date descending (annotated)",
-  "simple-logs.tags.revealInGraphCommands": "Commands tried to reveal the commit in a Git graph view (e.g. GitLens). First available wins."
+  "simple-logs.tags.revealInGraphCommands": "Optional GitLens-style commands to scroll to the graph node after opening the Graph"
 }

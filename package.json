@@ -2,7 +2,7 @@
   "name": "simple-logs",
   "displayName": "Simple Logs",
   "description": "inline git log + git tag manager",
-  "version": "0.1.10",
+  "version": "0.1.11",
   "engines": {
     "vscode": "^1.75.0"
   },
