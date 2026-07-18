@@ -245,6 +245,36 @@ export const registerTagFeatures = (context: vscode.ExtensionContext): void => {
         })
       )
     }),
+    vscode.commands.registerCommand('simple-logs.tags.editMessage', async (item?: TagTreeItem) => {
+      const tag = asTagItem(item)?.tag
+      if (!tag) {
+        return
+      }
+      if (tag.sync === 'remote') {
+        vscode.window.showWarningMessage('仅远端存在，请先 fetch 到本地再改消息')
+        return
+      }
+      const isLightweight = !tag.annotation && !tag.tagger
+      const message = await vscode.window.showInputBox({
+        prompt: isLightweight
+          ? `为「${tag.name}」设置注解消息（将升级为 annotated）`
+          : `修改「${tag.name}」的注解消息`,
+        value: tag.annotation || tag.name,
+        placeHolder: 'tag message',
+        validateInput: v => (!v.trim() ? '消息不能为空' : undefined)
+      })
+      if (message === undefined) {
+        return
+      }
+      const tip =
+        tag.sync === 'both' || tag.sync === 'diverged'
+          ? `将用 git tag -f -a 重建「${tag.name}」；远端旧对象需再推送才会更新。继续？`
+          : `将用 git tag -f -a 重建「${tag.name}」的注解。继续？`
+      if (!(await confirmDanger(tip))) {
+        return
+      }
+      await notify(await service.editMessage(tag.name, message.trim()))
+    }),
     vscode.commands.registerCommand('simple-logs.tags.createBranch', async (item?: TagTreeItem) => {
       const tag = asTagItem(item)?.tag
       if (!tag) {

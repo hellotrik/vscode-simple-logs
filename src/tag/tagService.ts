@@ -265,6 +265,34 @@ export class TagService {
     return { ok: true, message: `已将 ${name} 指向 ${ref}` }
   }
 
+  /**
+   * 修改注解消息：git 无法原地改 msg，以 -f -a 在同一 commit 上重建。
+   * lightweight 会升级为 annotated。
+   */
+  async editMessage(name: string, message: string): Promise<{ ok: boolean; message: string }> {
+    const repoRoot = await resolveRepoRoot()
+    if (!repoRoot) {
+      return { ok: false, message: '未找到 Git 仓库' }
+    }
+    const peeled = await runGit(repoRoot, ['rev-parse', `${name}^{}`])
+    let commit = peeled.ok ? peeled.stdout : ''
+    if (!commit) {
+      const plain = await runGit(repoRoot, ['rev-parse', name])
+      if (!plain.ok || !plain.stdout) {
+        return { ok: false, message: plain.stderr || `无法解析 tag ${name} 指向的 commit` }
+      }
+      commit = plain.stdout
+    }
+    const res = await runGit(repoRoot, ['tag', '-f', '-a', name, '-m', message, commit])
+    if (!res.ok) {
+      return { ok: false, message: res.stderr || '修改 tag 消息失败' }
+    }
+    return {
+      ok: true,
+      message: `已更新 ${name} 的注解消息（本地已 -f 重建；若曾推送需再推此 tag）`
+    }
+  }
+
   /** fetch --tags */
   async fetchTags(): Promise<{ ok: boolean; message: string }> {
     const repoRoot = await resolveRepoRoot()

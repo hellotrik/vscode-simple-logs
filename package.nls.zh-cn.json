@@ -21,6 +21,7 @@
   "simple-logs.tags.prune": "Simple Logs: 清理远端已删 Tags",
   "simple-logs.tags.rename": "重命名 Tag",
   "simple-logs.tags.move": "移动 Tag 到指定 Commit",
+  "simple-logs.tags.editMessage": "修改 Tag 注解消息",
   "simple-logs.tags.createBranch": "从 Tag 创建分支",
   "simple-logs.tags.checkout": "检出 Tag（Detached）",
   "simple-logs.tags.defaultRemote": "Tag 推送/删除使用的默认远程（空=自动：唯一远程，否则 origin）",

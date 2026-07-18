@@ -2,7 +2,7 @@
   "name": "simple-logs",
   "displayName": "Simple Logs",
   "description": "inline git log + git tag manager",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "engines": {
     "vscode": "^1.75.0"
   },
@@ -103,6 +103,10 @@
         "title": "%simple-logs.tags.move%"
       },
       {
+        "command": "simple-logs.tags.editMessage",
+        "title": "%simple-logs.tags.editMessage%"
+      },
+      {
         "command": "simple-logs.tags.createBranch",
         "title": "%simple-logs.tags.createBranch%"
       },
@@ -176,6 +180,11 @@
           "group": "1_edit@2"
         },
         {
+          "command": "simple-logs.tags.editMessage",
+          "when": "view == simple-logs.tags && viewItem =~ /simpleLogsTag\\.(local|both|diverged)/",
+          "group": "1_edit@3"
+        },
+        {
           "command": "simple-logs.tags.deleteLocal",
           "when": "view == simple-logs.tags && viewItem =~ /simpleLogsTag\\.(local|both|diverged)/",
           "group": "2_delete@1"
@@ -232,6 +241,10 @@
         },
         {
           "command": "simple-logs.tags.move",
+          "when": "false"
+        },
+        {
+          "command": "simple-logs.tags.editMessage",
           "when": "false"
         },
         {

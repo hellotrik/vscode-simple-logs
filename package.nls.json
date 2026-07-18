@@ -21,6 +21,7 @@
   "simple-logs.tags.prune": "Simple Logs: Prune Tags",
   "simple-logs.tags.rename": "Rename Tag",
   "simple-logs.tags.move": "Move Tag to Commit",
+  "simple-logs.tags.editMessage": "Edit Tag Message",
   "simple-logs.tags.createBranch": "Create Branch from Tag",
   "simple-logs.tags.checkout": "Checkout Tag (Detached)",
   "simple-logs.tags.defaultRemote": "Default remote for tag push/delete (empty = auto: sole remote, else origin)",
