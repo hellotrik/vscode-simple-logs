@@ -35,6 +35,62 @@
 				"npm: watch-tests"
 			],
 			"problemMatcher": []
+		},
+		{
+			"label": "simple-logs: pack",
+			"type": "shell",
+			"icon": {
+				"id": "package",
+				"tooltip": "升版（patch+1）→ yarn package → vsce → dist/simple-logs-<version>.vsix"
+			},
+			"command": "bash abs/sh/pack-simple-logs.sh",
+			"options": {
+				"cwd": "${workspaceFolder}"
+			},
+			"group": "build",
+			"problemMatcher": []
+		},
+		{
+			"label": "simple-logs: pack (no-bump)",
+			"type": "shell",
+			"icon": {
+				"id": "archive",
+				"tooltip": "按当前 package.json 版本打包（不升版）"
+			},
+			"command": "bash abs/sh/pack-simple-logs.sh --no-bump",
+			"options": {
+				"cwd": "${workspaceFolder}"
+			},
+			"group": "build",
+			"problemMatcher": []
+		},
+		{
+			"label": "simple-logs: install",
+			"type": "shell",
+			"icon": {
+				"id": "extensions",
+				"tooltip": "选 dist vsix → cursor/code 安装 → 清旧扩展目录"
+			},
+			"command": "bash abs/sh/install-simple-logs.sh",
+			"options": {
+				"cwd": "${workspaceFolder}"
+			},
+			"group": "build",
+			"problemMatcher": []
+		},
+		{
+			"label": "simple-logs: all",
+			"type": "shell",
+			"icon": {
+				"id": "rocket",
+				"tooltip": "pack（升版）→ install 一条龙"
+			},
+			"command": "bash abs/sh/install-simple-logs.sh --pack",
+			"options": {
+				"cwd": "${workspaceFolder}"
+			},
+			"group": "build",
+			"problemMatcher": []
 		}
 	]
 }
