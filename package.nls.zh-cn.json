@@ -24,6 +24,15 @@
   "simple-logs.tags.editMessage": "修改 Tag 注解消息",
   "simple-logs.tags.createBranch": "从 Tag 创建分支",
   "simple-logs.tags.checkout": "检出 Tag（Detached）",
+  "simple-logs.tags.revealInGitTree": "在 Git 树视图中显示",
   "simple-logs.tags.defaultRemote": "Tag 推送/删除使用的默认远程（空=自动：唯一远程，否则 origin）",
-  "simple-logs.tags.confirmDangerous": "删除远端 / 同时删除 / prune / 强制移动前是否确认"
+  "simple-logs.tags.confirmDangerous": "删除远端 / 同时删除 / prune / 强制移动前是否确认",
+  "simple-logs.tags.sortOrder": "Tag 列表排序",
+  "simple-logs.tags.sortOrder.commitDesc": "按指向的 commit 时间，新的在上（git 树）",
+  "simple-logs.tags.sortOrder.commitAsc": "按指向的 commit 时间，旧的在上",
+  "simple-logs.tags.sortOrder.versionDesc": "版本号降序",
+  "simple-logs.tags.sortOrder.versionAsc": "版本号升序",
+  "simple-logs.tags.sortOrder.nameAsc": "名称 A→Z",
+  "simple-logs.tags.sortOrder.dateDesc": "注解 tagger 日期降序",
+  "simple-logs.tags.revealInGraphCommands": "用于在 Git 图中定位 commit 的命令列表（如 GitLens）；按序尝试第一个可用的"
 }

@@ -2,7 +2,7 @@
   "name": "simple-logs",
   "displayName": "Simple Logs",
   "description": "inline git log + git tag manager",
-  "version": "0.1.8",
+  "version": "0.1.10",
   "engines": {
     "vscode": "^1.75.0"
   },
@@ -113,6 +113,11 @@
       {
         "command": "simple-logs.tags.checkout",
         "title": "%simple-logs.tags.checkout%"
+      },
+      {
+        "command": "simple-logs.tags.revealInGitTree",
+        "title": "%simple-logs.tags.revealInGitTree%",
+        "icon": "$(type-hierarchy)"
       }
     ],
     "views": {
@@ -165,9 +170,14 @@
           "group": "1_sync@2"
         },
         {
-          "command": "simple-logs.tags.checkout",
+          "command": "simple-logs.tags.revealInGitTree",
           "when": "view == simple-logs.tags",
           "group": "1_sync@3"
+        },
+        {
+          "command": "simple-logs.tags.checkout",
+          "when": "view == simple-logs.tags",
+          "group": "1_sync@4"
         },
         {
           "command": "simple-logs.tags.rename",
@@ -254,6 +264,10 @@
         {
           "command": "simple-logs.tags.checkout",
           "when": "false"
+        },
+        {
+          "command": "simple-logs.tags.revealInGitTree",
+          "when": "false"
         }
       ]
     },
@@ -302,6 +316,38 @@
           "type": "boolean",
           "default": true,
           "description": "%simple-logs.tags.confirmDangerous%"
+        },
+        "simple-logs.tags.sortOrder": {
+          "type": "string",
+          "enum": [
+            "commitDesc",
+            "commitAsc",
+            "versionDesc",
+            "versionAsc",
+            "nameAsc",
+            "dateDesc"
+          ],
+          "enumDescriptions": [
+            "%simple-logs.tags.sortOrder.commitDesc%",
+            "%simple-logs.tags.sortOrder.commitAsc%",
+            "%simple-logs.tags.sortOrder.versionDesc%",
+            "%simple-logs.tags.sortOrder.versionAsc%",
+            "%simple-logs.tags.sortOrder.nameAsc%",
+            "%simple-logs.tags.sortOrder.dateDesc%"
+          ],
+          "default": "commitDesc",
+          "description": "%simple-logs.tags.sortOrder%"
+        },
+        "simple-logs.tags.revealInGraphCommands": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [
+            "gitlens.showInCommitGraph",
+            "gitlens.showCommitInGraph"
+          ],
+          "description": "%simple-logs.tags.revealInGraphCommands%"
         }
       }
     }

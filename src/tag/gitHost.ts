@@ -6,9 +6,15 @@ import { getGitCommand } from '../gitcommand'
 const execFileAsync = promisify(execFile)
 
 /** vscode.git API（最小子集） */
+export type GitAPIRepository = {
+  rootUri: { fsPath: string }
+  state: { remotes: { name: string }[] }
+  getCommit?(ref: string): Thenable<{ hash: string; message: string; parents: string[] }>
+}
+
 type GitAPI = {
-  repositories: { rootUri: { fsPath: string }; state: { remotes: { name: string }[] } }[]
-  getRepository(uri: Uri): { rootUri: { fsPath: string } } | null
+  repositories: GitAPIRepository[]
+  getRepository(uri: Uri): GitAPIRepository | null
 }
 
 export type GitRunResult = {
@@ -57,6 +63,20 @@ const getGitAPI = async (): Promise<GitAPI | undefined> => {
   } catch {
     return undefined
   }
+}
+
+export const resolveGitApiRepository = async (
+  repoRoot: string
+): Promise<GitAPIRepository | undefined> => {
+  const api = await getGitAPI()
+  if (!api) {
+    return undefined
+  }
+  const matched = api.repositories.find(r => r.rootUri.fsPath === repoRoot)
+  if (matched) {
+    return matched
+  }
+  return api.getRepository(Uri.file(repoRoot)) ?? undefined
 }
 
 /** 解析当前操作仓库根目录 */

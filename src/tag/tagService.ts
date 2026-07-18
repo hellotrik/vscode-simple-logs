@@ -1,8 +1,9 @@
 import { workspace } from 'vscode'
 import { runGit, resolveDefaultRemote, resolveRepoRoot } from './gitHost'
+import { sortTags, type TagSortOrder } from './tagSort'
 import type { CreateTagOptions, TagInfo, TagSyncStatus } from './types'
 
-/** *object = 剥壳后的 commit；无则退回 object（lightweight） */
+/** *object = 剥壳后的 commit；*committerdate = 该 commit 在树上的时间 */
 const LOCAL_FORMAT = [
   '%(refname:short)',
   '%(objectname:short)',
@@ -11,7 +12,9 @@ const LOCAL_FORMAT = [
   '%(*objectname)',
   '%(contents:subject)',
   '%(taggername)',
-  '%(taggerdate:iso-strict)'
+  '%(taggerdate:iso-strict)',
+  '%(*committerdate:iso-strict)',
+  '%(committerdate:iso-strict)'
 ].join('%00')
 
 type LocalTagRow = {
@@ -21,6 +24,7 @@ type LocalTagRow = {
   annotation: string
   tagger: string
   when: string
+  commitWhen: string
 }
 
 const parseLocalTags = (stdout: string): LocalTagRow[] => {
@@ -32,17 +36,29 @@ const parseLocalTags = (stdout: string): LocalTagRow[] => {
     .map(line => line.trim())
     .filter(Boolean)
     .map(line => {
-      const [name, objShort, objFull, peeledShort, peeledFull, annotation, tagger, when] =
-        line.split('\0')
+      const [
+        name,
+        objShort,
+        objFull,
+        peeledShort,
+        peeledFull,
+        annotation,
+        tagger,
+        when,
+        peeledCommitWhen,
+        commitWhenFallback
+      ] = line.split('\0')
       const commit = (peeledShort || objShort || '').trim()
       const object = (peeledFull || objFull || '').trim()
+      const commitWhen = (peeledCommitWhen || commitWhenFallback || '').trim()
       return {
         name: name ?? '',
         commit,
         object,
         annotation: annotation ?? '',
         tagger: tagger ?? '',
-        when: when ?? ''
+        when: when ?? '',
+        commitWhen
       }
     })
     .filter(t => t.name)
@@ -118,23 +134,27 @@ export class TagService {
     }
 
     const names = new Set([...localMap.keys(), ...remoteMap.keys()])
-    const tags: TagInfo[] = [...names]
-      .sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' }))
-      .map(name => {
-        const local = localMap.get(name)
-        const remoteCommit = remoteMap.get(name)
-        const { sync, remoteCommit: divergedRemote } = mergeSync(local, remoteCommit)
-        return {
-          name,
-          commit: local?.commit ?? remoteCommit ?? '',
-          object: local?.object,
-          annotation: local?.annotation || undefined,
-          tagger: local?.tagger || undefined,
-          when: local?.when || undefined,
-          sync,
-          remoteCommit: divergedRemote
-        }
-      })
+    const unsorted: TagInfo[] = [...names].map(name => {
+      const local = localMap.get(name)
+      const remoteCommit = remoteMap.get(name)
+      const { sync, remoteCommit: divergedRemote } = mergeSync(local, remoteCommit)
+      return {
+        name,
+        commit: local?.commit ?? remoteCommit ?? '',
+        object: local?.object,
+        annotation: local?.annotation || undefined,
+        tagger: local?.tagger || undefined,
+        when: local?.when || undefined,
+        commitWhen: local?.commitWhen || undefined,
+        sync,
+        remoteCommit: divergedRemote
+      }
+    })
+
+    const order =
+      (workspace.getConfiguration('simple-logs').get<TagSortOrder>('tags.sortOrder') as TagSortOrder) ||
+      'commitDesc'
+    const tags = sortTags(unsorted, order)
 
     return { repoRoot, tags, remote }
   }

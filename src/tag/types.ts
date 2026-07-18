@@ -9,7 +9,10 @@ export type TagInfo = {
   object?: string
   annotation?: string
   tagger?: string
+  /** annotated tag 的 tagger 时间 */
   when?: string
+  /** 指向的 commit 的 committer 时间（git 树节点先后） */
+  commitWhen?: string
   sync: TagSyncStatus
   /** 远端指向的 commit（与本地不一致时） */
   remoteCommit?: string

@@ -52,11 +52,7 @@ export class TagTreeItem extends TreeItem {
       .join('\n')
     this.iconPath = syncIcon(tag.sync)
     this.contextValue = `simpleLogsTag.${tag.sync}`
-    this.command = {
-      command: 'simple-logs.tags.showDetails',
-      title: 'Show Tag Details',
-      arguments: [this]
-    }
+    // 不绑 command：单击仅选中，详情走右键；避免误触弹窗
   }
 }
 

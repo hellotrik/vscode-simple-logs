@@ -2,6 +2,7 @@ import * as vscode from 'vscode'
 import { TagService } from './tagService'
 import { TagTreeItem, TagTreeProvider } from './tagTreeProvider'
 import type { CreateTagOptions } from './types'
+import { revealTagInGitTree } from './revealInGitTree'
 
 const asTagItem = (arg: unknown): TagTreeItem | undefined =>
   arg instanceof TagTreeItem ? arg : undefined
@@ -106,7 +107,7 @@ export const registerTagFeatures = (context: vscode.ExtensionContext): void => {
         tag.when ? `When: ${tag.when}` : undefined,
         provider.getRemote() ? `Remote: ${provider.getRemote()}` : 'Remote: （未解析）'
       ].filter(Boolean)
-      await vscode.window.showInformationMessage(lines.join('\n'), { modal: true })
+      await vscode.window.showInformationMessage(lines.join('\n'))
     }),
     vscode.commands.registerCommand('simple-logs.tags.copyName', async (item?: TagTreeItem) => {
       const name = asTagItem(item)?.tag.name
@@ -301,6 +302,19 @@ export const registerTagFeatures = (context: vscode.ExtensionContext): void => {
       }
       await notify(await service.checkoutDetach(tag.name), false)
       refresh()
+    }),
+    vscode.commands.registerCommand('simple-logs.tags.revealInGitTree', async (item?: TagTreeItem) => {
+      const tag = asTagItem(item)?.tag
+      if (!tag) {
+        return
+      }
+      const result = await revealTagInGitTree(tag.name)
+      if (!result.ok) {
+        vscode.window.showErrorMessage(result.message)
+        return
+      }
+      // 轻提示即可，不再提供 Detached 高亮（会破坏/打乱图表）
+      vscode.window.setStatusBarMessage(result.message, 5000)
     })
   )
 }
