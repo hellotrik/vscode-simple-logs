@@ -11,6 +11,7 @@ ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
 OUT_DIR="$ROOT/dist"
 BUMP="patch"
 NO_BUMP=0
+FORCE_INSTALL=0
 
 bump_package_version() {
   local level="$1"
@@ -49,9 +50,10 @@ usage() {
   默认打包前修订号（第三位）+1，不打 git tag。
 
 选项:
-  --no-bump       不改动版本号，按当前 package.json 打包
-  --bump LEVEL    自增级别：patch（默认）| minor | major
-  -h, --help      显示此帮助
+  --no-bump         不改动版本号，按当前 package.json 打包
+  --bump LEVEL      自增级别：patch（默认）| minor | major
+  --force-install   强制 yarn install（默认：已有 node_modules/@vscode/vsce 则跳过）
+  -h, --help        显示此帮助
 
 示例:
   $(basename "$0")              # patch +1 后打包
@@ -63,6 +65,7 @@ EOF
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --no-bump) NO_BUMP=1; shift ;;
+    --force-install) FORCE_INSTALL=1; shift ;;
     --bump)
       BUMP="${2:?--bump 需要 patch|minor|major}"
       shift 2
@@ -87,8 +90,31 @@ fi
 
 cd "$ROOT"
 
+ensure_deps() {
+  local vsce_bin="$ROOT/node_modules/.bin/vsce"
+  if [[ "$FORCE_INSTALL" -eq 0 && -x "$vsce_bin" ]]; then
+    echo "→ 跳过 yarn install（已有 vsce；需要重装请加 --force-install）"
+    return 0
+  fi
+  echo "→ yarn install（无 lockfile 时可能较慢，尤其在网络盘）"
+  # 本仓 .gitignore 忽略了 *.lock，frozen 通常会失败；prefer-offline 减轻卡住感
+  if [[ -f "$ROOT/yarn.lock" ]]; then
+    yarn install --frozen-lockfile --prefer-offline
+  else
+    yarn install --prefer-offline
+  fi
+  if [[ ! -x "$vsce_bin" ]]; then
+    echo "未找到 @vscode/vsce，请确认已写入 package.json devDependencies" >&2
+    exit 1
+  fi
+}
+
 PKG_NAME="$(node -p "require('./package.json').name")"
 OLD_VERSION="$(node -p "require('./package.json').version")"
+
+# 先装依赖再升版，避免 install 卡住时版本已改
+ensure_deps
+
 if [[ "$NO_BUMP" -eq 0 ]]; then
   if [[ "$BUMP" == "patch" ]]; then
     echo "→ 版本 $OLD_VERSION → 修订号（第三位）+1"
@@ -104,13 +130,11 @@ fi
 VERSION="$(node -p "require('./package.json').version")"
 VSIX="$OUT_DIR/${PKG_NAME}-${VERSION}.vsix"
 
-echo "→ yarn install"
-yarn install --frozen-lockfile 2>/dev/null || yarn install
-
 mkdir -p "$OUT_DIR"
-echo "→ vsce package（prepublish → yarn package）"
-# 无 runtime dependencies，--no-dependencies 即可
-yarn vsce package --no-dependencies -o "$VSIX"
+echo "→ webpack production（vscode:prepublish）"
+# 直接调 vsce，避免 yarn 再包一层；CI=1 禁止交互提示
+# --no-dependencies：无 runtime deps
+CI=1 "$ROOT/node_modules/.bin/vsce" package --no-dependencies -o "$VSIX"
 
 SIZE="$(du -h "$VSIX" | awk '{print $1}')"
 echo "→ $VSIX ($SIZE)"

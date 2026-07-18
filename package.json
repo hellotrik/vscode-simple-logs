@@ -1,8 +1,8 @@
 {
   "name": "simple-logs",
   "displayName": "Simple Logs",
-  "description": "inline git log",
-  "version": "0.1.5",
+  "description": "inline git log + git tag manager",
+  "version": "0.1.7",
   "engines": {
     "vscode": "^1.75.0"
   },
@@ -27,10 +27,13 @@
     "git blame",
     "git log",
     "git inline log",
-    "git"
+    "git",
+    "git tags",
+    "tag"
   ],
   "categories": [
-    "Other"
+    "Other",
+    "SCM Providers"
   ],
   "activationEvents": [
     "onStartupFinished"
@@ -40,9 +43,207 @@
     "commands": [
       {
         "command": "simple-logs.clearCache",
-        "title": "Simple Logs: clearCache"
+        "title": "%simple-logs.clearCache%"
+      },
+      {
+        "command": "simple-logs.tags.refresh",
+        "title": "%simple-logs.tags.refresh%",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "simple-logs.tags.create",
+        "title": "%simple-logs.tags.create%",
+        "icon": "$(add)"
+      },
+      {
+        "command": "simple-logs.tags.pushAll",
+        "title": "%simple-logs.tags.pushAll%",
+        "icon": "$(cloud-upload)"
+      },
+      {
+        "command": "simple-logs.tags.showDetails",
+        "title": "%simple-logs.tags.showDetails%"
+      },
+      {
+        "command": "simple-logs.tags.copyName",
+        "title": "%simple-logs.tags.copyName%"
+      },
+      {
+        "command": "simple-logs.tags.deleteLocal",
+        "title": "%simple-logs.tags.deleteLocal%"
+      },
+      {
+        "command": "simple-logs.tags.deleteRemote",
+        "title": "%simple-logs.tags.deleteRemote%"
+      },
+      {
+        "command": "simple-logs.tags.deleteBoth",
+        "title": "%simple-logs.tags.deleteBoth%"
+      },
+      {
+        "command": "simple-logs.tags.pushOne",
+        "title": "%simple-logs.tags.pushOne%"
+      },
+      {
+        "command": "simple-logs.tags.fetch",
+        "title": "%simple-logs.tags.fetch%",
+        "icon": "$(cloud-download)"
+      },
+      {
+        "command": "simple-logs.tags.prune",
+        "title": "%simple-logs.tags.prune%",
+        "icon": "$(trash)"
+      },
+      {
+        "command": "simple-logs.tags.rename",
+        "title": "%simple-logs.tags.rename%"
+      },
+      {
+        "command": "simple-logs.tags.move",
+        "title": "%simple-logs.tags.move%"
+      },
+      {
+        "command": "simple-logs.tags.createBranch",
+        "title": "%simple-logs.tags.createBranch%"
+      },
+      {
+        "command": "simple-logs.tags.checkout",
+        "title": "%simple-logs.tags.checkout%"
       }
     ],
+    "views": {
+      "scm": [
+        {
+          "id": "simple-logs.tags",
+          "name": "%simple-logs.tags.view%",
+          "icon": "$(tag)",
+          "contextualTitle": "%simple-logs.tags.view%"
+        }
+      ]
+    },
+    "menus": {
+      "view/title": [
+        {
+          "command": "simple-logs.tags.refresh",
+          "when": "view == simple-logs.tags",
+          "group": "navigation@1"
+        },
+        {
+          "command": "simple-logs.tags.create",
+          "when": "view == simple-logs.tags",
+          "group": "navigation@2"
+        },
+        {
+          "command": "simple-logs.tags.fetch",
+          "when": "view == simple-logs.tags",
+          "group": "navigation@3"
+        },
+        {
+          "command": "simple-logs.tags.pushAll",
+          "when": "view == simple-logs.tags",
+          "group": "navigation@4"
+        },
+        {
+          "command": "simple-logs.tags.prune",
+          "when": "view == simple-logs.tags",
+          "group": "navigation@5"
+        }
+      ],
+      "view/item/context": [
+        {
+          "command": "simple-logs.tags.pushOne",
+          "when": "view == simple-logs.tags && viewItem =~ /simpleLogsTag\\.(local|both|diverged)/",
+          "group": "1_sync@1"
+        },
+        {
+          "command": "simple-logs.tags.createBranch",
+          "when": "view == simple-logs.tags",
+          "group": "1_sync@2"
+        },
+        {
+          "command": "simple-logs.tags.checkout",
+          "when": "view == simple-logs.tags",
+          "group": "1_sync@3"
+        },
+        {
+          "command": "simple-logs.tags.rename",
+          "when": "view == simple-logs.tags && viewItem =~ /simpleLogsTag\\.(local|both|diverged)/",
+          "group": "1_edit@1"
+        },
+        {
+          "command": "simple-logs.tags.move",
+          "when": "view == simple-logs.tags && viewItem =~ /simpleLogsTag\\.(local|both|diverged)/",
+          "group": "1_edit@2"
+        },
+        {
+          "command": "simple-logs.tags.deleteLocal",
+          "when": "view == simple-logs.tags && viewItem =~ /simpleLogsTag\\.(local|both|diverged)/",
+          "group": "2_delete@1"
+        },
+        {
+          "command": "simple-logs.tags.deleteRemote",
+          "when": "view == simple-logs.tags && viewItem =~ /simpleLogsTag\\.(remote|both|diverged)/",
+          "group": "2_delete@2"
+        },
+        {
+          "command": "simple-logs.tags.deleteBoth",
+          "when": "view == simple-logs.tags && viewItem =~ /simpleLogsTag\\.(both|diverged)/",
+          "group": "2_delete@3"
+        },
+        {
+          "command": "simple-logs.tags.copyName",
+          "when": "view == simple-logs.tags",
+          "group": "3_misc@1"
+        },
+        {
+          "command": "simple-logs.tags.showDetails",
+          "when": "view == simple-logs.tags",
+          "group": "3_misc@2"
+        }
+      ],
+      "commandPalette": [
+        {
+          "command": "simple-logs.tags.showDetails",
+          "when": "false"
+        },
+        {
+          "command": "simple-logs.tags.copyName",
+          "when": "false"
+        },
+        {
+          "command": "simple-logs.tags.deleteLocal",
+          "when": "false"
+        },
+        {
+          "command": "simple-logs.tags.deleteRemote",
+          "when": "false"
+        },
+        {
+          "command": "simple-logs.tags.deleteBoth",
+          "when": "false"
+        },
+        {
+          "command": "simple-logs.tags.pushOne",
+          "when": "false"
+        },
+        {
+          "command": "simple-logs.tags.rename",
+          "when": "false"
+        },
+        {
+          "command": "simple-logs.tags.move",
+          "when": "false"
+        },
+        {
+          "command": "simple-logs.tags.createBranch",
+          "when": "false"
+        },
+        {
+          "command": "simple-logs.tags.checkout",
+          "when": "false"
+        }
+      ]
+    },
     "configuration": {
       "title": "Simple Logs",
       "properties": {
@@ -78,6 +279,16 @@
           "type": "boolean",
           "default": true,
           "description": "%simple-logs.onlyShowUncommittedInfo%"
+        },
+        "simple-logs.tags.defaultRemote": {
+          "type": "string",
+          "default": "",
+          "description": "%simple-logs.tags.defaultRemote%"
+        },
+        "simple-logs.tags.confirmDangerous": {
+          "type": "boolean",
+          "default": true,
+          "description": "%simple-logs.tags.confirmDangerous%"
         }
       }
     }
